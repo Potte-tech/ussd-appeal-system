@@ -80,8 +80,8 @@ def ussd_callback():
                 else:
                     status_id = status_row[0]
                     cursor.execute(
-                        "INSERT INTO appeals (student_id, module_name, reason, status, status_id) VALUES (%s, %s, %s, %s, %s)",
-                        (student_id, module, reason, 'Pending', status_id))
+                        "INSERT INTO appeals (student_id, module_name, reason,  status_id, status) VALUES (%s, %s, %s, %s, %s)",
+                        (student_id, module, reason, status_id, 'Pending'))
                     conn.commit()
                     response = "END Appeal submitted successfully."
                 conn.close()
