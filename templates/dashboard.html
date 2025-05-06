@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Appeals Dashboard</h2>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-danger">Logout</a>
+      </div>
+
+      <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Student ID</th>
+            <th>Module</th>
+            <th>Reason</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appeal in appeals %}
+            <tr>
+              <td>{{ appeal[0] }}</td>
+              <td>{{ appeal[1] }}</td>
+              <td>{{ appeal[2] }}</td>
+              <td>{{ appeal[3] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
