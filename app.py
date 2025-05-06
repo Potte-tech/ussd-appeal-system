@@ -7,7 +7,7 @@ app = Flask(__name__)
 # Sessions: track temporary interactions for 5 minutes
 sessions = {}
 
-@app.route("/ussd", methods=["POST"])  # ✅ CHANGED from "/" to "/ussd"
+@app.route("/ussd", methods=["POST"])
 def ussd_callback():
     session_id = request.form.get("sessionId")
     service_code = request.form.get("serviceCode")
@@ -38,7 +38,7 @@ def ussd_callback():
         response += "2. Appeal my marks\n"
         response += "3. Check appeal status\n"
 
-    elif parts[0] == "1":  # ✅ Option 1: Check marks
+    elif parts[0] == "1":  # Option 1: Check marks
         if len(parts) == 1:
             response = "CON Enter your Student ID:"
         elif len(parts) == 2:
@@ -57,7 +57,7 @@ def ussd_callback():
             except Exception as e:
                 response = f"END Database error: {str(e)}"
 
-    elif parts[0] == "2":  # ✅ Option 2: Appeal
+    elif parts[0] == "2":  # Option 2: Appeal
         if len(parts) == 1:
             response = "CON Enter your Student ID:"
         elif len(parts) == 2:
@@ -71,16 +71,24 @@ def ussd_callback():
             try:
                 conn = get_connection()
                 cursor = conn.cursor()
-                cursor.execute(
-                    "INSERT INTO appeals (student_id, module_name, reason, status) VALUES (%s, %s, %s, 'Pending')",
-                    (student_id, module, reason))
-                conn.commit()
+
+                # Get the status_id for 'Pending'
+                cursor.execute("SELECT id FROM appeal_status WHERE status_name = %s", ('Pending',))
+                status_row = cursor.fetchone()
+                if status_row is None:
+                    response = "END Error: 'Pending' status not found in appeal_status table."
+                else:
+                    status_id = status_row[0]
+                    cursor.execute(
+                        "INSERT INTO appeals (student_id, module_name, reason, status, status_id) VALUES (%s, %s, %s, %s, %s)",
+                        (student_id, module, reason, 'Pending', status_id))
+                    conn.commit()
+                    response = "END Appeal submitted successfully."
                 conn.close()
-                response = "END Appeal submitted successfully."
             except Exception as e:
                 response = f"END Database error: {str(e)}"
 
-    elif parts[0] == "3":  # ✅ Option 3: Check appeal status
+    elif parts[0] == "3":  # Option 3: Check appeal status
         if len(parts) == 1:
             response = "CON Enter your Student ID:"
         elif len(parts) == 2:
@@ -107,4 +115,3 @@ def ussd_callback():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
-
